@@ -3,7 +3,8 @@
 
 
 #function which loads entire dump file into memory
-def read_whole_dump(file):
+def read_whole_dump(file:str) -> dict:
+    """read the whole file into a dictionary and return it"""
     #intializing variables
     count = 0    
     timeStep = []
@@ -28,6 +29,6 @@ def read_whole_dump(file):
                 s_line = line.split()     #splits lines at the whitespace
                 unDumped[(s_line[0],s_line[1])] = (s_line[2],s_line[3],s_line[4])  #creates the dict mentioned
 
-                    
+    return unDumped           
 
 
