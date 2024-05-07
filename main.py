@@ -1,9 +1,7 @@
 #unDumped = [{'TIMESTEP':int, 'NUMBER OF ATOMS':int, 'BOX BOUNDS':dict specific to each boundary condition}, 'ATOMS':[dict specific to dump style]}]
 #pp dict: {'x':[x1,x2], 'y':[y1,y2].'z':[z1,z2]}
 #id type scaled positions {'id':str, 'type':str, 'xs':str, 'ys':str, 'zs':str}
-
-
-
+#id type element positions {'id':str, 'type':str, 'element':str, 'x':str, 'y':str, 'z':str}
 
 
 def read_whole_dump(file:str) -> list[dict[str:any]]:
@@ -33,14 +31,22 @@ def read_whole_dump(file:str) -> list[dict[str:any]]:
             elif lineCount == 8:
                 unDumped[frameCount]["BOX BOUNDS"]["z"] = line.split()
             elif lineCount == 9: #line that contains information about the atom information being dumped, generates format of output dictionary 
-                v_line = line.split()
+                v_line = line.split() #store all the parameters in a list
             elif lineCount >= 10: #lines 10 and up contain dump data of each atom
-                s_line = line.split()
-                unDumped[frameCount]["ATOMS"].append({v_line[2]:s_line[0], v_line[3]:s_line[1], v_line[4]:s_line[2], v_line[5]:s_line[3], v_line[6]:s_line[4]}) #creating a dict specifiying each atom
+                s_line = line.split() #store all the values in a list
+                paraCount = 0 #intializing a parameter count that keeps track of how many parameters specifty an atom
+                atomDict = {} #creating an empty dict for every new atom
+                for para in v_line: #iterating over each parameter to store it for each atom
+                    if para != 'ATOMS' and para != 'ITEM:': #ignoring those indicators
+                        atomDict[para] = s_line[paraCount] #creating the dictionary pair by pair
+                        paraCount += 1 #updating the paraCount to be able to index the list properly
+                unDumped[frameCount]["ATOMS"].append(atomDict) #adding the dict specifiying each atom to the final data structure
+                
                 
     return unDumped
 
 
-  
+print(read_whole_dump("fcc_Cu_0.lammpstrj"))
+
                 
                 
