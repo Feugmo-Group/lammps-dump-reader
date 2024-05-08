@@ -4,7 +4,7 @@
 #id type element positions {'id':str, 'type':str, 'element':str, 'x':str, 'y':str, 'z':str}
 
 
-def read_whole_dump(file:str) -> list[dict[str:any]]:
+def read_whole_dump(file: str) -> list[dict[str:any]]:
     """read the entire file into an unDumped data structure"""
     lineCount = 0 #keeps track of what line we are in a given frame
     frameCount = -1 #keeps track of what frame we are in, starts at =1 because the first frame is considered the 0th frame
@@ -16,7 +16,7 @@ def read_whole_dump(file:str) -> list[dict[str:any]]:
             if "TIMESTEP" in line: #how we know we are in a new frame
                 lineCount = 1 #resets the lineCount every frame
                 frameCount += 1 #updates the frameCount when we enter a new frame
-                unDumped.append({"TIMESTEP":0 , "NUMBER OF ATOMS":0 , "BOX BOUNDS":{} , "ATOMS": [] }) #skeleton of the final output data structure
+                unDumped.append({}) #skeleton of the final output data structure
             if lineCount == 2: #The line in a frame that contains the time step information
                 unDumped[frameCount]["TIMESTEP"] = int(line) #updates the value of the TIMESTEP key
             elif lineCount == 4:
@@ -46,7 +46,7 @@ def read_whole_dump(file:str) -> list[dict[str:any]]:
     return unDumped
 
 
-print(read_whole_dump("fcc_Cu_0.lammpstrj"))
+print(read_whole_dump("dump.lammpstrj"))
 
                 
                 
