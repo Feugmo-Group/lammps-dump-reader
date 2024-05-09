@@ -55,7 +55,8 @@ def read_whole_dump(file: str) -> list[dict[str:any]]:
 
 
 def read_dump(file: str) -> list[dict[str:any]]:
-        frameCount = -1 #keeps track of what frame we are in, starts at =1 because the first frame is considered the 0th frame
+    """generator object that yields one frame of the file at a time"""
+    frameCount = -1 #keeps track of what frame we are in, starts at =1 because the first frame is considered the 0th frame
     unDumped = [] #intializing the final return object
     loopCount = 0 #intializes the frame loop counter which keeps track of how many times the loops runs within a given frame
 
@@ -66,6 +67,7 @@ def read_dump(file: str) -> list[dict[str:any]]:
                 loopCount = 0 #resets the loop count on a new frame
                 mode = "timeStep" #sets the parser "mode", allows the parser to know what information to grab from the next line
                 checkLoop = loopCount #keeps track of what the loop number was when the parser saw the title, important because now on the next loop the parser can grab the information it needs
+                yield unDumped #converts the function into a generator object, yielding each frame
                 frameCount += 1 #updates the frameCount when we enter a new frame
                 unDumped.append({"ATOMS":[]}) #skeleton of the final output data structure
             if mode == 'timeStep' and (loopCount - checkLoop) == 1: # finds the line that comes after the TIMESTEP title
@@ -100,8 +102,7 @@ def read_dump(file: str) -> list[dict[str:any]]:
                 unDumped[frameCount]["ATOMS"].append(atomDict) #adding the dict specifiying each atom to the final data structure
                 
                 
+
     
 
-
-                
-                
+            
