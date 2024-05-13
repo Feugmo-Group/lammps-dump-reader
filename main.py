@@ -24,8 +24,6 @@ def read_dump(file: str) -> Generator[dict[str:any], None, None]:
                 loopCount = 0
                 mode = Modes.TIME
                 checkLoop = loopCount
-                if unDumped:
-                    yield unDumped
                 unDumped = {"ATOMS": []}
             if mode == Modes.TIME and (loopCount - checkLoop) == 1:
                 unDumped["TIMESTEP"] = int(line)
@@ -34,6 +32,7 @@ def read_dump(file: str) -> Generator[dict[str:any], None, None]:
                 checkLoop = loopCount
             if mode == Modes.NUM and (loopCount - checkLoop) == 1:
                 unDumped["NUMBER OF ATOMS"] = int(line)
+                frameLength = int(line) 
             if "BOX BOUNDS" in line:
                 mode = Modes.BOUNDS
                 checkLoop = loopCount
@@ -47,8 +46,10 @@ def read_dump(file: str) -> Generator[dict[str:any], None, None]:
             if "ITEM: ATOMS" in line:
                 mode = Modes.ATOM
                 checkLoop = loopCount
+                lengthCheck = 0
                 v_line = line.split()
             if mode == Modes.ATOM and (loopCount - checkLoop) >= 1:
+                lengthCheck += 1
                 s_line = line.split()
                 paraCount = 0
                 atomDict = {}
@@ -57,10 +58,12 @@ def read_dump(file: str) -> Generator[dict[str:any], None, None]:
                         atomDict[para] = s_line[paraCount]
                         paraCount += 1
                 unDumped["ATOMS"].append(atomDict)
-
+            if mode == Modes.ATOM and lengthCheck == frameLength and unDumped:
+                yield unDumped
 
 def read_whole_dump(file: str) -> list[dict[str:any]]:
     """read the entire file into an unDumped data structure"""
     return list(read_dump(file))
 
 
+    
