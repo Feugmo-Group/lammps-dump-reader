@@ -71,9 +71,7 @@ def read_yaml(file: str) -> Generator[dict[str:any], None, None]:
             unDumped["TIMESTEP"] = line["timestep"]
             unDumped["NUMBER OF ATOMS"] = line["natoms"]
             unDumped["BOX BOUNDS"] = {}
-            unDumped["BOX BOUNDS"]["x"] = line["box"][
-                0
-            ]  # this might not always be at the 0th entry, test other dump files to see whether true or not
+            unDumped["BOX BOUNDS"]["x"] = line["box"][0] #this may not always follow this structure, test this further
             unDumped["BOX BOUNDS"]["y"] = line["box"][1]
             unDumped["BOX BOUNDS"]["z"] = line["box"][2]
             unDumped["ATOMS"] = []
@@ -88,20 +86,30 @@ def read_yaml(file: str) -> Generator[dict[str:any], None, None]:
             yield unDumped
 
 
-def read_dump(file, type=None):
-    if type == "yaml":
-        read_yaml(file)
-    elif type == "classic":
-        read_classic(file)
-    if type == None:
+def read_dump(file, tpe=None):
+    """return a generator object"""
+    if tpe == "yaml":
+        return read_yaml(file)
+    elif tpe == "classic":
+        return read_classic(file)
+    if tpe == None:
         if ".yaml" in file:
-            read_yaml(file)
+            return read_yaml(file)
         else:
-            read_classic(file)
+            return read_classic(file)
 
 
-def read_whole_dump(file: str) -> list[dict[str:any]]:
+def read_whole_dump(file: str, tpe=None) -> list[dict[str:any]]:
     """read the entire file into an unDumped data structure"""
-    return list(read_dump(file))
+    if tpe == "yaml":
+        return list(read_yaml(file))
+    elif tpe == "classic":
+        return list(read_classic(file))
+    if tpe == None:
+        if ".yaml" in file:
+            return list(read_yaml(file))
+        else:
+            return list(read_classic(file))
 
 
+print(read_whole_dump("dump.yaml"))
