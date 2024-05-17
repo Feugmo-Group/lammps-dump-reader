@@ -3,13 +3,16 @@ from typing import Generator
 import yaml
 
 # unDumped = [{'TIMESTEP':int, 'NUMBER OF ATOMS':int, 'BOX BOUNDS':dict, 'ATOMS':[dict specific to dump style]}]
-
+# grid unDumped = 
 
 class Modes(Enum):
     TIME = 1
     NUM = 2
     BOUNDS = 3
     ATOM = 4
+    DIM = 5
+    GRID_S = 6
+    GRID_C = 7
 
 
 def read_classic(file: str) -> Generator[dict[str:any], None, None]:
@@ -71,7 +74,7 @@ def read_yaml(file: str) -> Generator[dict[str:any], None, None]:
             unDumped["TIMESTEP"] = line["timestep"]
             unDumped["NUMBER OF ATOMS"] = line["natoms"]
             unDumped["BOX BOUNDS"] = {}
-            unDumped["BOX BOUNDS"]["x"] = line["box"][0] #this may not always follow this structure, test this further
+            unDumped["BOX BOUNDS"]["x"] = line["box"][0]  # this may not always follow this structure, test this further format here may be slightly diff from classic, check if thats okay
             unDumped["BOX BOUNDS"]["y"] = line["box"][1]
             unDumped["BOX BOUNDS"]["z"] = line["box"][2]
             unDumped["ATOMS"] = []
@@ -85,6 +88,57 @@ def read_yaml(file: str) -> Generator[dict[str:any], None, None]:
                 unDumped["ATOMS"].append(atomDict)
             yield unDumped
 
+
+def read_grid(file: str) -> Generator[dict[str:any], None, None]:
+    """Generator object that yields one frame at a time from grid style dumps"""
+
+    unDumped = {}
+    loopCount = 0
+    frameLength = 0
+    gridID = 1
+
+    with open(file, "r") as myfile:
+        for line in myfile:
+            loopCount += 1
+            if loopCount - gridID == 10: #temporary solution
+                breakpoint()
+                yield unDumped
+            if "TIMESTEP" in line:
+                loopCount = 0
+                mode = Modes.TIME
+                checkLoop = loopCount
+            if mode == Modes.TIME and (loopCount - checkLoop) == 1:
+                unDumped["TIMESTEP"] = int(line)
+            if "BOX BOUNDS" in line:
+                mode = Modes.BOUNDS
+                checkLoop = loopCount
+                unDumped["BOX BOUNDS"] = {"x": [], "y": [], "z": []}
+            if mode == Modes.BOUNDS and (loopCount - checkLoop) == 1:
+                unDumped["BOX BOUNDS"]["x"] = line.split()
+            if mode == Modes.BOUNDS and (loopCount - checkLoop) == 2:
+                unDumped["BOX BOUNDS"]["y"] = line.split()
+            if mode == Modes.BOUNDS and (loopCount - checkLoop) == 3:
+                unDumped["BOX BOUNDS"]["z"] = line.split()
+            if "DIMENSION" in line:
+                mode = Modes.DIM
+                checkLoop = loopCount
+            if mode == Modes.DIM and (loopCount - checkLoop) == 1:
+                unDumped["DIMENSION"] = int(line)
+            if "GRID SIZE" in line:
+                mode = Modes.GRID_S
+                checkLoop = loopCount
+            if mode == Modes.GRID_S and (loopCount - checkLoop) == 1:
+                unDumped["GRID SIZE"] = line.split() #Ask Xander if this format okay
+            if "GRID CELLS" in line:
+                mode = Modes.GRID_C
+                checkLoop = loopCount
+                gridName = line.split()[3] #is it always the 3rd index? 
+                unDumped[gridName] = {}
+                gridID = 1
+            if mode == Modes.GRID_C and (loopCount - checkLoop) >= 1:
+                unDumped[gridName][gridID] = line
+                gridID += 1
+            
 
 def read_dump(file, tpe=None):
     """return a generator object"""
@@ -110,6 +164,9 @@ def read_whole_dump(file: str, tpe=None) -> list[dict[str:any]]:
             return list(read_yaml(file))
         else:
             return list(read_classic(file))
-
-
-print(read_whole_dump("dump.yaml"))
+        
+    
+g = read_grid("dumpgrid.grid")
+for i in g:
+    print(i)
+    break
