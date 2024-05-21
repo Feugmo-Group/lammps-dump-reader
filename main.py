@@ -94,17 +94,17 @@ def read_grid(file: str) -> Generator[dict[str:any], None, None]:
 
     unDumped = {}
     loopCount = 0
-    frameLength = 0
     gridID = 1
-
+    frameLength = 0
+    frameCount = 0
+    
     with open(file, "r") as myfile:
         for line in myfile:
             loopCount += 1
-            if loopCount - gridID == 10: #temporary solution
-                breakpoint()
-                yield unDumped
+            if frameCount < 2:
+                frameLength += 1
             if "TIMESTEP" in line:
-                loopCount = 0
+                frameCount += 1
                 mode = Modes.TIME
                 checkLoop = loopCount
             if mode == Modes.TIME and (loopCount - checkLoop) == 1:
@@ -138,6 +138,8 @@ def read_grid(file: str) -> Generator[dict[str:any], None, None]:
             if mode == Modes.GRID_C and (loopCount - checkLoop) >= 1:
                 unDumped[gridName][gridID] = line
                 gridID += 1
+            if frameCount > 1 and unDumped and (loopCount - frameLength) % (gridID + 10) == 0:
+                yield unDumped
             
 
 def read_dump(file, tpe=None):
@@ -146,11 +148,17 @@ def read_dump(file, tpe=None):
         return read_yaml(file)
     elif tpe == "classic":
         return read_classic(file)
-    if tpe == None:
+    elif tpe == "grid":
+        return read_grid(file)  
+    elif tpe == None:
         if ".yaml" in file:
             return read_yaml(file)
-        else:
+        elif ".lammpstrj" in file:
             return read_classic(file)
+        elif ".grid" in file:
+            return read_grid(file)
+        else:
+            raise Exception("Unsupported File Type") 
 
 
 def read_whole_dump(file: str, tpe=None) -> list[dict[str:any]]:
@@ -159,14 +167,16 @@ def read_whole_dump(file: str, tpe=None) -> list[dict[str:any]]:
         return list(read_yaml(file))
     elif tpe == "classic":
         return list(read_classic(file))
-    if tpe == None:
+    elif tpe == "grid":
+        return list(read_grid(file))  
+    elif tpe == None:
         if ".yaml" in file:
             return list(read_yaml(file))
-        else:
+        elif ".lammpstrj" in file:
             return list(read_classic(file))
-        
+        elif ".grid" in file:
+            return list(read_grid(file))
+        else:
+            raise Exception("Unsupported File Type") 
     
-g = read_grid("dumpgrid.grid")
-for i in g:
-    print(i)
-    break
+
