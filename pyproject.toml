@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "lammps-dump-reader"
+name = "unDumper"
 version = "0.0.1"
 description = "A fast and memory-efficient LAMMPS dump file reader with great developer experience"
 authors = [
