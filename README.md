@@ -64,15 +64,14 @@ whole_data = undumper.read_whole_dump(file) #where file can be a classic, grid o
 
 The output data structure in each of these cases looks as follows, the only difference is that read_dump generates a dictionary representing one frame and read_whole dump generates a list of dictionaries with each being an individual frame
 
-An example of the output data structure followspo
 ```python
 unDumped = [{'TIMESTEP':0, 'NUMBER OF ATOMS':1600, 'BOX BOUNDS':{x: [0,0], y: [0,0]. z: [0,0]}, 'ATOMS':{id: 1, 'Element': "Li", "xu": 1, "yu": 2, "zu": 3}]
 ```
 
 ### FUll COMMAND LIST
 
-read_dump
-read_whole_dump
-read_classic
-read_yaml
-read_grid
+**read_dump**
+**read_whole_dump**
+**read_classic**
+**read_yaml**
+**read_grid**
