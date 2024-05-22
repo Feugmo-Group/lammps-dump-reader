@@ -44,3 +44,28 @@ You would extract the information needed at the start of the script. `read_dump`
 3. Potentially rewrite `read_whole_dump`, if performance improvements are expected.
 4. Potentially rewrite the whole package with Rust bindings.
 
+
+### Current Usage
+```python
+import undumper 
+
+data = undumper.read_dump(file) #where file can be a classic, grid or yaml lammps dump file 
+
+for snapshot in data:
+    timesteps.append(snapshot["TIMESTEP"])
+    positions.append([])
+
+    for atom in snapshot["ATOMS"]:
+        if atom["element"] == "Li":
+            positions[-1].append([atom["xu"], atom["yu"], atom["zu"]])
+
+whole_data = undumper.read_whole_dump(file) #where file can be a classic, grid or yaml lammps dump file
+```
+
+The output data structure in each of these cases looks as follows, the only difference is that read_dump generates a dictionary representing one frame and read_whole dump generates a list of dictionaries with each being an individual frame
+
+An example of the output data structure followspo
+```python
+unDumped = [{'TIMESTEP':0, 'NUMBER OF ATOMS':1600, 'BOX BOUNDS':{x: [0,0], y: [0,0]. z: [0,0]}, 'ATOMS':{id: 1, 'Element': "Li", "xu": 1, "yu": 2, "zu": 3}]
+```
+

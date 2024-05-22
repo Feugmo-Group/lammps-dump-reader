@@ -74,7 +74,7 @@ def read_yaml(file: str) -> Generator[dict[str:any], None, None]:
             unDumped["TIMESTEP"] = line["timestep"]
             unDumped["NUMBER OF ATOMS"] = line["natoms"]
             unDumped["BOX BOUNDS"] = {}
-            unDumped["BOX BOUNDS"]["x"] = line["box"][0]  # this may not always follow this structure, test this further format here may be slightly diff from classic, check if thats okay
+            unDumped["BOX BOUNDS"]["x"] = line["box"][0]  
             unDumped["BOX BOUNDS"]["y"] = line["box"][1]
             unDumped["BOX BOUNDS"]["z"] = line["box"][2]
             unDumped["ATOMS"] = []
@@ -128,11 +128,11 @@ def read_grid(file: str) -> Generator[dict[str:any], None, None]:
                 mode = Modes.GRID_S
                 checkLoop = loopCount
             if mode == Modes.GRID_S and (loopCount - checkLoop) == 1:
-                unDumped["GRID SIZE"] = line.split() #Ask Xander if this format okay
+                unDumped["GRID SIZE"] = line.split() 
             if "GRID CELLS" in line:
                 mode = Modes.GRID_C
                 checkLoop = loopCount
-                gridName = line.split()[3] #is it always the 3rd index? 
+                gridName = line.split()[3] u
                 unDumped[gridName] = {}
                 gridID = 1
             if mode == Modes.GRID_C and (loopCount - checkLoop) >= 1:
