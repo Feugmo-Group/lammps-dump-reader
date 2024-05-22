@@ -69,3 +69,10 @@ An example of the output data structure followspo
 unDumped = [{'TIMESTEP':0, 'NUMBER OF ATOMS':1600, 'BOX BOUNDS':{x: [0,0], y: [0,0]. z: [0,0]}, 'ATOMS':{id: 1, 'Element': "Li", "xu": 1, "yu": 2, "zu": 3}]
 ```
 
+### FUll COMMAND LIST
+
+read_dump
+read_whole_dump
+read_classic
+read_yaml
+read_grid
