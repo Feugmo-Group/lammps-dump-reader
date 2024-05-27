@@ -132,7 +132,7 @@ def read_grid(file: str) -> Generator[dict[str:any], None, None]:
             if "GRID CELLS" in line:
                 mode = Modes.GRID_C
                 checkLoop = loopCount
-                gridName = line.split()[3] u
+                gridName = line.split()[3] 
                 unDumped[gridName] = {}
                 gridID = 1
             if mode == Modes.GRID_C and (loopCount - checkLoop) >= 1:
