@@ -1,53 +1,47 @@
-# LAMMPS Dump Reader
-A fast and memory-efficient LAMMPS dump file reader with great developer experience.
+# unDumper
+**unDumper** is a fast and memory-efficient LAMMPS dump file reader with great developer experience.
+Completely unbiased and applicable to all projects
 
-## Project Charter
-**Goal:** The goal of this project is to develop an open-source Python package that can read LAMMPS dump files into Python for further analysis.
+## Features
 
-**Objectives:**
-1. The package will be unopinionated. All `dump` and `dump_modify` configurations will be easy to read, and all output data will be treated on equal footing.
-2. The package will be easy to install using `pip`.
-3. The package will have a good developer experience, including type-hinting and documentation.
-4. The package will be fast and memory-efficient (only one frame will be loaded into memory at a time).
+- Generator objects to load one frame of a dump file at a time
+- Capable of loading entire dumps into memory
+- Supports classic, YAML and grid type dumps
+- Utilizes a dictionary data structure for seamless integration with other plotting software in Python
+- Completely general, with data structure generated based on your dump file
 
-### Envisioned usage
-There will be two overarching ways to use this package. The most forgiving way would be to use
-```python
-import dump_reader
+## Installation
 
-# Bring whole dump file into memory
-data = dump_reader.read_whole_dump("dump.lammpstrj")
+**unDumper** is available on PyPI. Install it via pip
+
+```bash
+pip install undumper
 ```
-This will bring the entire dump file into memory, so that it can be accessed at any point.
 
-Because dump files may be large, you may not want to bring the whole file into memory at once. In this case, you can use
+## Usage
+
+There are many ways to use **unDumper**, and here we'll cover a few examples to illustrate its versatility in your project
+
+In all cases you start by importing the package which can be done using the following
+
 ```python
-import dump_reader
-
-timesteps = []
-positions = []
-
-# Bring each snapshot in individually
-for snapshot in dump_reader.read_dump("dump.lammpstrj"):
-    timesteps.append(snapshot["TIMESTEP"])
-    positions.append([])
-
-    for atom in snapshot["ATOMS"]:
-        if atom["element"] == "Li":
-            positions[-1].append([atom["xu"], atom["yu"], atom["zu"]])
+from undumper import undumper
 ```
-You would extract the information needed at the start of the script. `read_dump` would return an generator object, so that each snapshot is read in only as needed.
 
-### Milestones
-1. Implement `read_whole_dump`.
-2. Implement `read_dump` using what was learned.
-3. Potentially rewrite `read_whole_dump`, if performance improvements are expected.
-4. Potentially rewrite the whole package with Rust bindings.
+From here, several functions are available. For most cases, you'll use either 'read_dump()' or 'read_whole_dump()'
 
-
-### Current Usage
 ```python
-import undumper 
+
+undumper.read_dump('dump.lammpstrj', 'classic')
+undumper.read_dump('dump.grid')
+undumper.read_dump('dump.yaml')
+```
+
+When using read_dump, you may or may not specify the file type. In general, leaving the second argument blank is preferred
+
+read_dump generates a generator object which can be used in a loop as follows
+
+```python
 
 data = undumper.read_dump(file) #where file can be a classic, grid or yaml lammps dump file 
 
@@ -58,20 +52,39 @@ for snapshot in data:
     for atom in snapshot["ATOMS"]:
         if atom["element"] == "Li":
             positions[-1].append([atom["xu"], atom["yu"], atom["zu"]])
-
-whole_data = undumper.read_whole_dump(file) #where file can be a classic, grid or yaml lammps dump file
 ```
 
-The output data structure in each of these cases looks as follows, the only difference is that read_dump generates a dictionary representing one frame and read_whole dump generates a list of dictionaries with each being an individual frame
+At this point it is important to understand the structure of the dictionary that **unDumper** outputs, this applies to both the generator which returns the dictionary on each yield, and the 'read_whole_dump()' which returns a list of the following dictionaries
 
 ```python
-unDumped = [{'TIMESTEP':0, 'NUMBER OF ATOMS':1600, 'BOX BOUNDS':{x: [0,0], y: [0,0]. z: [0,0]}, 'ATOMS':{id: 1, 'Element': "Li", "xu": 1, "yu": 2, "zu": 3}]
+unDumped = {'TIMESTEP':0, 'NUMBER OF ATOMS':1600, 'BOX BOUNDS':{x: [0,0], y: [0,0]. z: [0,0]}, 'ATOMS':{id: 1, 'Element': "Li", "xu": 1, "yu": 2, "zu": 3}}
 ```
+If your dump file has more parameters for specifying an atom they will be added in a similar manor, a good idea is to print and look at what your dictionary looks like before you start working with it
 
-### FUll COMMAND LIST
+All the remaining functions are generally not recomended to be used and are listed here
 
-**read_dump**
-**read_whole_dump**
-**read_classic**
-**read_yaml**
-**read_grid**
+- 'read_classic()' 
+- 'read_yaml()'
+- 'read_grid()'
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+This work was conducted by the Intellimatter Group under Dr. Conrard Giresse Tetsassi Feugmo at the University of Waterloo.
+
+Special thanks to Xander Gouws for supervising this project and originating the idea behind it.
+
+## Contact
+
+For any questions or feedback, feel free to contact me at mu2farooqi@uwaterloo.ca
+
+Let us know is there are any features you would like to see or if you find this project useful
+
+
+
+
+
+
+
